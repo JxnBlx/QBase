@@ -266,20 +266,22 @@ int* getRange(BPT* tree, int start, int end){
     if (tree->root->keys[0] == INT_MAX) return NULL;
     BPTNode* closestStart = getClosestNode(tree->root, start);
     BPTNode* closestEnd = getClosestNode(tree->root, end);
-    int len = 0, size = 4;
+    int len = 0; 
+    int size = 4;
     int* nodes = (int*)malloc(sizeof(int)*4);
     while (closestStart != NULL && closestStart->prev != closestEnd){
         // printf("Closest start: %d\n", closestStart->keys[0]);
         int i = 0; 
         while (closestStart->keys[i] < start) i++;
         while(i<closestStart->n && closestStart->keys[i] <= end){
+            // printf("node key: %d\n", closestStart->keys[i]);
             nodes[len] = closestStart->keys[i];
-            printf("Added %d\n", nodes[len]);
             len++;
             i++;
             
             if (len==size){
                 int* temp = (int*)malloc(sizeof(int)*size*2);
+                if (temp==NULL) printf("Memory allocation failed at size %d\n", size*2);
                 for (int i = 0; i< size; i++){
                     temp[i] = nodes[i];
                 }

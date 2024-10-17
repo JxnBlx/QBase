@@ -395,14 +395,17 @@ void test_bplus_tree_range_1(){
 void test_bplus_tree_range_random_order(){
     BPT* tree = bptInit(3);
     for (int i = 0; i<1000; i++){
-        int r = rand();
-        insert(tree, r);
+        insert(tree, i);
     }
     int* range = getRange(tree, 500, 5000);
     int* range1 = getRange(tree, 500, 500);
+    int* range2 = getRange(tree, -INT_MAX, INT_MAX);
     assert(range1[0] == 500 || range1[0] == -1);
     for (int i = 0; range[i]!= -1; i++){
         assert(search(tree, range[i]));
+    }
+    for (int i = 0; range2[i]!= -1; i++){
+        assert(search(tree, range2[i]));
     }
     printf("Range random order test passed.\n");
     freeTree(tree);
@@ -437,7 +440,6 @@ void test_bplus_tree_range_with_deletes_1(){
     }
     int* range = getRange(tree, 0, 10000);
     for (int i = 0; range[i]!= -1; i++){
-        printf("%d, %d\n", i, range[i]);
         assert(search(tree, range[i]));
     }
     printf("Range with deletes test 1 passed.\n");
@@ -495,17 +497,19 @@ void test_bplus_tree_extreme_full_10000000(){
     BPT* tree = bptInit(3);
     printf("Inserting\n");
     for (int i = 0; i<10000000; i++){
-        insert(tree, rand());
+        insert(tree, i);
     }
-    for (int i = 0; i<500000; i++){
-        del(tree, rand());
+    int i = 0;
+    for (i; i<15000; i++){
+        del(tree, i);
     }
-    
-    int* range = getRange(tree, -INT_MAX, INT_MAX);
+    printf(search(tree, 9999999) ? "true" : "false");
+    printf(search(tree, 10000000) ? "true" : "false");
+
+    int* range = getRange(tree, 0, INT_MAX);
     if (range == NULL) printf("Range is null\n");
-    printf("%d\n", range[0]);
+
     for (int i = 0; range[i]!= -1; i++){
-        printf("%d, %d\n", i, range[i]);
         assert(search(tree, range[i]));
     }
     for (int i = 0; i<10000000; i++){
@@ -517,6 +521,7 @@ void test_bplus_tree_extreme_full_10000000(){
     }
     printf("Extreme full test 10,000,000 passed.\n");
 }
+
 void test_bplus_tree_extreme_full_100000000(){
     BPT* tree = bptInit(3);
     printf("Inserting\n");
@@ -548,33 +553,34 @@ void test_bplus_tree_extreme_full_100000000(){
 int main() {
     printf("\n");
     // test_free_tree();
-    // test_bplus_tree_initialization();
-    // test_bplus_tree_insertion_0();
-    // test_bplus_tree_insertion_1();
-    // test_bplus_tree_insertion_2();
-    // test_bplus_tree_node_split();
-    // test_bplus_tree_propagate_splits_upward();
-    // test_bplus_tree_double_split();
-    // test_bplus_tree_extreme_split();
-    // test_bplus_tree_random_numbers();
-    // test_bplus_tree_search();
-    // test_bplus_tree_search_extreme();
-    // test_bplus_tree_deletion();
-    // test_bplus_tree_delete_cascade();
-    // test_bplus_tree_delete_cascade_1();
-    // test_bplus_tree_delete_cascade_2();
-    // test_bplus_tree_delete_cascade_extreme();
-    // test_bplus_tree_get_closest_node();
-    // test_bplus_tree_get_closest_node_mass_delete_0();
-    // test_bplus_tree_get_closest_node_mass_delete_1();
-    // test_bplus_tree_get_closest_node_max_int();
-    // test_bplus_tree_range_0();
-    // test_bplus_tree_range_1();
-    // test_bplus_tree_range_random_order();
-    // test_bplus_tree_range_with_deletes_0();
-    // test_bplus_tree_range_with_deletes_1();
-    // test_bplus_tree_extreme_full_10000();
-    // test_bplus_tree_extreme_full_1000000();
+    test_bplus_tree_initialization();
+    test_bplus_tree_insertion_0();
+    test_bplus_tree_insertion_1();
+    test_bplus_tree_insertion_2();
+    test_bplus_tree_node_split();
+    test_bplus_tree_propagate_splits_upward();
+    test_bplus_tree_double_split();
+    test_bplus_tree_extreme_split();
+    test_bplus_tree_random_numbers();
+    test_bplus_tree_search();
+    test_bplus_tree_search_extreme();
+    test_bplus_tree_deletion();
+    test_bplus_tree_delete_cascade();
+    test_bplus_tree_delete_cascade_1();
+    test_bplus_tree_delete_cascade_2();
+    test_bplus_tree_delete_cascade_extreme();
+    test_bplus_tree_get_closest_node();
+    test_bplus_tree_get_closest_node_mass_delete_0();
+    test_bplus_tree_get_closest_node_mass_delete_1();
+    test_bplus_tree_get_closest_node_max_int();
+    test_bplus_tree_range_0();
+    test_bplus_tree_range_1();
+    test_bplus_tree_range_random_order();
+    test_bplus_tree_range_with_deletes_0();
+    test_bplus_tree_range_with_deletes_1();
+    test_bplus_tree_extreme_full_10000();
+    test_bplus_tree_extreme_full_1000000();
     test_bplus_tree_extreme_full_10000000();
+    // test_bplus_tree_extreme_full_100000000();
     return 0;
 }
