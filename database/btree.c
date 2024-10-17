@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stddef.h>
 #include "btree.h"
+#include <climits>
 
 BPT* bptInit(int _t){
     BPT* tree = (BPT*)malloc(sizeof(BPT));
@@ -11,7 +12,7 @@ BPT* bptInit(int _t){
 }
 
 void bptnInit(BPTNode* node, int _t){
-    node->keys = (int*)malloc(sizeof(int)* (2*_t - 1));
+    node->keys = (int*)malloc(sizeof(int)* (2*_t));
     for (int i = 0; i<2*_t;i++) node->keys[i] = INT_MAX;
     node->t = _t;
     node->n = 0;
@@ -29,6 +30,7 @@ void insert(BPT* tree, int key){
         root->leaf = 1;
         tree->root = root;
     }
+    if (search(tree, key)) return;
     nodeInsert(tree->root, key);
 }
 
@@ -104,8 +106,8 @@ void nodeSplit(BPTNode* root){
     if (root->leaf == 0){
         leftNode->leaf = 0;
         rightNode->leaf = 0;
-        leftNode->children = (BPTNode**)malloc(sizeof(BPTNode*)*root->t);
-        rightNode->children = (BPTNode**)malloc(sizeof(BPTNode*)*root->t);
+        leftNode->children = (BPTNode**)malloc(sizeof(BPTNode*)*(2*root->t+1));
+        rightNode->children = (BPTNode**)malloc(sizeof(BPTNode*)*(2*root->t+1));
         for (int i = 0; i < root->t; i++){
             leftNode->children[i] = root->children[i];
             leftNode->children[i]->parent = leftNode;
@@ -122,7 +124,7 @@ void nodeSplit(BPTNode* root){
             root->keys[i] = INT_MAX;
         }
         if (root->children == NULL){
-            BPTNode** children = (BPTNode**)malloc(sizeof(BPTNode*)*2);
+            BPTNode** children = (BPTNode**)malloc(sizeof(BPTNode*)*(2*root->t+1));
             root->children = children;
         }
         for (int i = 0; i<root->n; i++){
@@ -237,7 +239,6 @@ void clearEmptyNode(BPTNode* root){
                 root->next->prev = root->prev;
             }
         }
-        free(root);
         parent->n--;
         for (int j = i; j<parent->n; j++){
             parent->keys[j] = parent->keys[j+1];
@@ -266,6 +267,7 @@ int* getRange(BPT* tree, int start, int end){
     int len = 0, size = 4;
     int* nodes = (int*)malloc(sizeof(int)*4);
     while (closestStart != NULL && closestStart->prev != closestEnd){
+        // printf("Closest start: %d\n", closestStart->keys[0]);
         int i = 0; 
         while (closestStart->keys[i] < start) i++;
         while(i<closestStart->n && closestStart->keys[i] <= end){
@@ -300,31 +302,17 @@ void freeNode(BPTNode* root) {
     if (root == NULL) {
         return;
     }
-    
-    if (root != NULL && !root->leaf && root->children != NULL) {
-        for (int i = 0; root!=NULL && i <= root->n; i++) { 
-            if (root->children[i] != NULL) {
-                freeNode(root->children[i]);
-            }
+
+    if (!root->leaf){
+        for (int i = 0; i<root->n; i++){
+            freeNode(root->children[i]);
         }
     }
-    if (root->children != NULL) {
-        free(root->children);
-        root->children = NULL;
-    }
-    if(root!= NULL && root->keys != NULL && root->keys[0]) {
-        free(root->keys);
-        root->keys =NULL;
-    }
-    if (root != NULL && root->prev != NULL) {
-        free(root->prev);
-        root->prev = NULL;
-    }
-    if (root != NULL && root->parent != NULL) {
-        free(root->parent);
-        root->parent = NULL;
-    }
-    if (root != NULL) {
-        free(root);
-    }
+
+    free(root->keys);
+
+    if(root->children != NULL) free(root->children);
+
+    free(root);
+
 }

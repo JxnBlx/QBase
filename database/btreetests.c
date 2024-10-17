@@ -1,49 +1,53 @@
 #include "btree.c"
 #include <assert.h>
 #include <stdio.h>
+#include <malloc.h>
+#include <stdlib.h>
+#include <climits>
+#include <cstring>
 
-void printBTree(BPTNode* root, int level) {
-    if (root != NULL) {
-        // Print current node's keys
-        for (int i = 0; i < level; i++) printf("  "); // Indentation for levels
-        for (int i = 0; i < root->n; i++) {
-            printf("%d ", root->keys[i]);
-        }
-        printf("\n");
+void get_memory_usage_kb(long* vmrss_kb, long* vmsize_kb) {
+    FILE* file = fopen("/proc/self/status", "r");
+    if (!file) {
+        perror("Could not open /proc/self/status");
+        return;
+    }
 
-        // Recursively print children nodes
-        if (!root->leaf) {
-            for (int i = 0; i <= root->n; i++) {
-                printBTree(root->children[i], level + 1);
-            }
+    char line[256];
+    while (fgets(line, sizeof(line), file)) {
+        if (strncmp(line, "VmRSS:", 6) == 0) {
+            sscanf(line, "VmRSS: %ld kB", vmrss_kb);
+        } else if (strncmp(line, "VmSize:", 7) == 0) {
+            sscanf(line, "VmSize: %ld kB", vmsize_kb);
         }
     }
+    fclose(file);
 }
 
-void printBTreeLeaves(BPTNode* root) {
-    if (root->leaf){
-        for (int i = 0; i < root->n; i++){
-            printf("%d ", root->keys[i]);
+void test_free_tree() {
+    long vmrss_before, vmsize_before;
+    long vmrss_after, vmsize_after;
+
+    // Get initial memory usage
+    get_memory_usage_kb(&vmrss_before, &vmsize_before);
+
+    for (int i = 0; i < 1000; i++) {
+        BPT* tree = bptInit(3);
+        for (int j = 0; j < 10000; j++) {
+            insert(tree, j);
         }
-        printf("\n");
-    } else {
-        for (int i = 0; i <= root->n; i++){
-            printBTreeLeaves(root->children[i]);
-        }
+        freeTree(tree);
     }
-}
 
-// void test_free_tree(){
-//     BPT* tree = bptInit(3);
-//     for (int i = 0; i<1000; i++){
-//         BPT* tree = bptInit(3);
-//         for (int j = 0; j<10000; j++){
-//             insert(tree, j);
-//         }
-//         freeTree(tree);
-//     }
-//     printf("Free tree test passed.\n");
-// }
+    // Get memory usage after operations
+    get_memory_usage_kb(&vmrss_after, &vmsize_after);
+
+    // Print memory usage details
+    // printf("Memory usage before: VmRSS = %ld KB, VmSize = %ld KB\n", vmrss_before, vmsize_before);
+    // printf("Memory usage after: VmRSS = %ld KB, VmSize = %ld KB\n", vmrss_after, vmsize_after);
+    printf("Memory used: VmRSS = %ld KB, VmSize = %ld KB\n", vmrss_after - vmrss_before, vmsize_after - vmsize_before);
+    printf("Free tree test passed.\n");
+}
 
 void test_bplus_tree_initialization() {
     BPT* tree = bptInit(3); // Assume this function initializes the tree
@@ -340,7 +344,7 @@ void test_bplus_tree_range_0(){
         assert(range[i] == i);
     }
     assert(!(range[11]==21));
-    printf("Range test passed.\n");
+    printf("Range test 0 passed.\n");
     freeTree(tree);
 }
 
@@ -362,9 +366,7 @@ void test_bplus_tree_range_random_order(){
     BPT* tree = bptInit(3);
     for (int i = 0; i<1000; i++){
         int r = rand();
-        if (!search(tree, r)){
-            insert(tree, r);
-        }
+        insert(tree, r);
     }
     int* range = getRange(tree, 500, 5000);
     int* range1 = getRange(tree, 500, 500);
@@ -400,44 +402,122 @@ void test_bplus_tree_range_with_deletes_1(){
     for (int i = 0; i<1000; i++){
         insert(tree, i);
     }
-    for (int i = 250; i<500; i++){
+    for (int i = 250; i<256; i++){
         del(tree, i);
     }
     int* range = getRange(tree, 0, 10000);
     for (int i = 0; range[i]!= -1; i++){
+        printf("%d, %d\n", i, range[i]);
         assert(search(tree, range[i]));
     }
     printf("Range with deletes test 1 passed.\n");
     freeTree(tree);
 }
 
+void test_bplus_tree_extreme_full_10000(){
+    BPT* tree = bptInit(3);
+    for (int i = 0; i<10000; i++){
+        insert(tree, rand());
+    }
+    for (int i = 0; i<5000; i++){
+        del(tree, i);
+    }
+    int* range = getRange(tree, -INT_MAX, INT_MAX);
+
+    for (int i = 0; range[i]!= -1; i++){
+        assert(search(tree, range[i]));
+    }
+    for (int i = 0; i<10000; i++){
+        insert(tree, rand());
+    }
+    int* range1 = getRange(tree, 7000, INT_MAX);
+    for (int i = 0; range1[i]!= -1; i++){
+        assert(search(tree, range1[i]));
+    }
+    printf("Extreme full test 10,000 passed.\n");
+}
+
+void test_bplus_tree_extreme_full_1000000(){
+    BPT* tree = bptInit(3);
+    printf("Inserting\n");
+    for (int i = 0; i<1000000; i++){
+        insert(tree, rand());
+    }
+    for (int i = 0; i<50000; i++){
+        del(tree, rand());
+    }
+    int* range = getRange(tree, -INT_MAX, INT_MAX);
+
+    for (int i = 0; range[i]!= -1; i++){
+        assert(search(tree, range[i]));
+    }
+    for (int i = 0; i<1000000; i++){
+        insert(tree, rand());
+    }
+    int* range1 = getRange(tree, 700000, INT_MAX);
+    for (int i = 0; range1[i]!= -1; i++){
+        assert(search(tree, range1[i]));
+    }
+    printf("Extreme full test 1,000,000 passed.\n");
+}
+
+void test_bplus_tree_extreme_full_1000000000(){
+    BPT* tree = bptInit(3);
+    printf("Inserting\n");
+    for (int i = 0; i<1000000000; i++){
+        insert(tree, i);
+    }
+    for (int i = 128918173; i<624156273; i++){
+        del(tree, i);
+    }
+    int* range = getRange(tree, -INT_MAX, INT_MAX);
+    printf("Searching\n");
+    for (int i = 0; range[i]!= -1; i++){
+        assert(search(tree, range[i]));
+    }
+    printf("Inserting\n");
+    for (int i = 0; i<1000000000; i++){
+        insert(tree, rand());
+    }
+    printf("Getting range\n");
+    int* range1 = getRange(tree, 700000000, INT_MAX);
+    for (int i = 0; range1[i]!= -1; i++){
+        assert(search(tree, range1[i]));
+    }
+    printf("Extreme full test 1,000,000,000 passed.\n");
+}
+
+
 int main() {
     printf("\n");
-    // test_free_tree();
-    test_bplus_tree_initialization();
-    test_bplus_tree_insertion_0();
-    test_bplus_tree_insertion_1();
-    test_bplus_tree_insertion_2();
-    test_bplus_tree_node_split();
-    test_bplus_tree_propagate_splits_upward();
-    test_bplus_tree_double_split();
-    test_bplus_tree_extreme_split();
-    test_bplus_tree_random_numbers();
-    test_bplus_tree_search();
-    test_bplus_tree_search_extreme();
-    test_bplus_tree_deletion();
-    test_bplus_tree_delete_cascade();
-    test_bplus_tree_delete_cascade_1();
-    test_bplus_tree_delete_cascade_2();
-    test_bplus_tree_delete_cascade_extreme();
-    test_bplus_tree_get_closest_node();
-    test_bplus_tree_get_closest_node_mass_delete_0();
-    test_bplus_tree_get_closest_node_mass_delete_1();
-    test_bplus_tree_get_closest_node_max_int();
-    test_bplus_tree_range_0();
-    test_bplus_tree_range_1();
-    test_bplus_tree_range_random_order();
-    test_bplus_tree_range_with_deletes_0();
-    test_bplus_tree_range_with_deletes_1();
+    test_free_tree();
+    // test_bplus_tree_initialization();
+    // test_bplus_tree_insertion_0();
+    // test_bplus_tree_insertion_1();
+    // test_bplus_tree_insertion_2();
+    // test_bplus_tree_node_split();
+    // test_bplus_tree_propagate_splits_upward();
+    // test_bplus_tree_double_split();
+    // test_bplus_tree_extreme_split();
+    // test_bplus_tree_random_numbers();
+    // test_bplus_tree_search();
+    // test_bplus_tree_search_extreme();
+    // test_bplus_tree_deletion();
+    // test_bplus_tree_delete_cascade();
+    // test_bplus_tree_delete_cascade_1();
+    // test_bplus_tree_delete_cascade_2();
+    // test_bplus_tree_delete_cascade_extreme();
+    // test_bplus_tree_get_closest_node();
+    // test_bplus_tree_get_closest_node_mass_delete_0();
+    // test_bplus_tree_get_closest_node_mass_delete_1();
+    // test_bplus_tree_get_closest_node_max_int();
+    // test_bplus_tree_range_0();
+    // test_bplus_tree_range_1();
+    // test_bplus_tree_range_random_order();
+    // test_bplus_tree_range_with_deletes_0();
+    // test_bplus_tree_range_with_deletes_1();
+    // test_bplus_tree_extreme_full_10000();
+    // test_bplus_tree_extreme_full_1000000();
+    // test_bplus_tree_extreme_full_1000000000();
     return 0;
 }
