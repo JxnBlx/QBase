@@ -79,6 +79,10 @@ void nodeSplit(BPTNode* root){
     // Initialize the nodes
     bptnInit(leftNode, root->t);
     bptnInit(rightNode, root->t);
+    if (root->leaf){
+        leftNode->next = rightNode;
+        rightNode->prev = leftNode;
+    }
     // Get the middle key
     int mid = root->keys[root->t-1];
     int midAdd = 0;
@@ -132,10 +136,7 @@ void nodeSplit(BPTNode* root){
         leftNode->parent = root;
         rightNode->parent = root;
         // update linked list
-        if (leftNode->leaf){
-            leftNode->next = rightNode;
-            rightNode->prev = leftNode;
-        }
+        
     } else {
         // update parent
         BPTNode* parent = root->parent;
@@ -154,14 +155,12 @@ void nodeSplit(BPTNode* root){
         leftNode->parent = parent;
         rightNode->parent = parent;
         //update linked list
-        if (leftNode->leaf){
+        if (root->leaf){
             if (root->prev != NULL){
-                printf("Updating left node prev which has first key: %d\n", root->prev->keys[0]);
                 root->prev->next = leftNode;
                 leftNode->prev = root->prev;
             }
             if (root->next != NULL){
-                printf("Updating right node next which has first key: %d\n", root->next->keys[0]);
                 root->next->prev = rightNode;
                 rightNode->next = root->next;
             }
@@ -230,6 +229,14 @@ void clearEmptyNode(BPTNode* root){
         BPTNode* parent = root->parent;
         int i = 0;
         while (i<=parent->n && parent->children[i]->keys[0] != INT_MAX) i++;
+        if (root->leaf){
+            if (root->prev != NULL){
+                root->prev->next = root->next;
+            }
+            if (root->next != NULL){
+                root->next->prev = root->prev;
+            }
+        }
         free(root);
         parent->n--;
         for (int j = i; j<parent->n; j++){
@@ -267,7 +274,6 @@ int* getRange(BPT* tree, int start, int end){
             i++;
             
             if (len==size){
-                printf("reallocating to size %d\n", size*2);
                 int* temp = (int*)malloc(sizeof(int)*size*2);
                 for (int i = 0; i< size; i++){
                     temp[i] = nodes[i];
@@ -279,4 +285,46 @@ int* getRange(BPT* tree, int start, int end){
     }
     if (len!=size) nodes[len] = -1;
     return nodes;
+}
+
+void freeTree(BPT* tree) {
+    if (tree == NULL || tree->root == NULL) {
+        free(tree);
+        return;
+    }
+    freeNode(tree->root);
+    free(tree);
+}
+
+void freeNode(BPTNode* root) {
+    if (root == NULL) {
+        return;
+    }
+    
+    if (root != NULL && !root->leaf && root->children != NULL) {
+        for (int i = 0; root!=NULL && i <= root->n; i++) { 
+            if (root->children[i] != NULL) {
+                freeNode(root->children[i]);
+            }
+        }
+    }
+    if (root->children != NULL) {
+        free(root->children);
+        root->children = NULL;
+    }
+    if(root!= NULL && root->keys != NULL && root->keys[0]) {
+        free(root->keys);
+        root->keys =NULL;
+    }
+    if (root != NULL && root->prev != NULL) {
+        free(root->prev);
+        root->prev = NULL;
+    }
+    if (root != NULL && root->parent != NULL) {
+        free(root->parent);
+        root->parent = NULL;
+    }
+    if (root != NULL) {
+        free(root);
+    }
 }

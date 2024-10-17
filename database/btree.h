@@ -26,3 +26,5 @@ int nodeDel(BPTNode* root, int key);
 void clearEmptyNode(BPTNode* node);
 BPTNode* getClosestNode(BPTNode* node, int key);
 int* getRange(BPT* tree, int start, int end);
+void freeTree(BPT* tree);
+void freeNode(BPTNode* root);

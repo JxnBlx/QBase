@@ -33,12 +33,25 @@ void printBTreeLeaves(BPTNode* root) {
     }
 }
 
+// void test_free_tree(){
+//     BPT* tree = bptInit(3);
+//     for (int i = 0; i<1000; i++){
+//         BPT* tree = bptInit(3);
+//         for (int j = 0; j<10000; j++){
+//             insert(tree, j);
+//         }
+//         freeTree(tree);
+//     }
+//     printf("Free tree test passed.\n");
+// }
+
 void test_bplus_tree_initialization() {
     BPT* tree = bptInit(3); // Assume this function initializes the tree
     assert(tree != NULL); // Tree should be initialized
     assert(tree->t == 3); // Order should be set correctly
     assert(tree->root == NULL); // Root should be initialized as NULL
     printf("Initialization test passed.\n");
+    freeTree(tree);
 }
 
 void test_bplus_tree_insertion_0() {
@@ -46,6 +59,7 @@ void test_bplus_tree_insertion_0() {
     insert(tree, 10);
     assert(tree->root->keys[0] == 10);
     printf("Insertion test 0 passed.\n");
+    freeTree(tree);
 }
 
 void test_bplus_tree_insertion_1() {
@@ -55,6 +69,7 @@ void test_bplus_tree_insertion_1() {
     assert(tree->root->keys[0] == 10);
     assert(tree->root->keys[1] == 20);
     printf("Insertion test 1 passed.\n");
+    freeTree(tree);
 }
 
 void test_bplus_tree_insertion_2() {
@@ -69,6 +84,7 @@ void test_bplus_tree_insertion_2() {
     assert(tree->root->keys[0] == 10);
     assert(tree->root->keys[1] == 20);
     printf("Insertion test 2 passed.\n");
+    freeTree(tree);
 }
 
 void test_bplus_tree_node_split() {
@@ -79,6 +95,7 @@ void test_bplus_tree_node_split() {
     insert(tree, 40); // This should cause a split
     assert(tree->root->children[0] != NULL); // Check if split occurred
     printf("Node split test passed.\n");
+    freeTree(tree);
 }
 
 void test_bplus_tree_propagate_splits_upward() {
@@ -89,6 +106,7 @@ void test_bplus_tree_propagate_splits_upward() {
     insert(tree, 40); // Further inserts to propagate split upward
     assert(tree->root->keys[0] == 20); // Check root key after propagation
     printf("Propagation of splits upward test passed.\n");
+    freeTree(tree);
 }
 
 void test_bplus_tree_double_split() {
@@ -105,6 +123,7 @@ void test_bplus_tree_double_split() {
     insert(tree, 100);
     assert(tree->root->keys[0] == 40);
     printf("Double split test passed.\n");
+    freeTree(tree);
 }
 
 void test_bplus_tree_extreme_split() {
@@ -116,6 +135,7 @@ void test_bplus_tree_extreme_split() {
     assert(tree->root->keys[1] != INT_MAX);
     assert(tree->root->keys[2] != INT_MAX);
     printf("Extreme split test passed.\n");
+    freeTree(tree);
 }
 
 void test_bplus_tree_random_numbers(){
@@ -125,6 +145,7 @@ void test_bplus_tree_random_numbers(){
     }
     assert(tree->root->keys[0] != INT_MAX);
     printf("Random insert test passed. \n");
+    freeTree(tree);
 }
 
 void test_bplus_tree_search() {
@@ -134,6 +155,7 @@ void test_bplus_tree_search() {
     assert(search(tree, 10)); // Key 10 should be found
     assert(!search(tree, 30)); // Key 30 should not be found yet
     printf("Search test passed.\n");
+    freeTree(tree);
 }
 
 void test_bplus_tree_search_extreme(){
@@ -153,21 +175,24 @@ void test_bplus_tree_search_extreme(){
         assert(!search(tree, i));
     }
     printf("Extreme search test passed.\n");
+    freeTree(tree);
 }
 
 void test_bplus_tree_deletion() {
     BPT* tree = bptInit(3);
     insert(tree, 10);
     insert(tree, 20);
-    printf("%d", del(tree, 20));
+    del(tree, 20);
     assert(!search(tree, 20)); // Key 20 should be deleted
     printf("Deletion test passed.\n");
+    freeTree(tree);
 }
 
 void test_bplus_tree_empty_deletion(){
     BPT* tree = bptInit(3);
     assert(!del(tree, 1));
     printf("Empty deletion test passed.\n");
+    freeTree(tree);
 }
 
 void test_bplus_tree_delete_cascade(){
@@ -183,6 +208,7 @@ void test_bplus_tree_delete_cascade(){
     del(tree, 60);
     assert(tree->root->n == 1);
     printf("Cascade test passed.\n");
+    freeTree(tree);
 }
 
 void test_bplus_tree_delete_cascade_1(){
@@ -195,6 +221,7 @@ void test_bplus_tree_delete_cascade_1(){
     del(tree, 6);
     assert(tree->root->children[0]->children[0]->n == 1);
     printf("Cascade test 1 passed.\n");
+    freeTree(tree);
 }
 
 void test_bplus_tree_delete_cascade_2(){
@@ -209,6 +236,7 @@ void test_bplus_tree_delete_cascade_2(){
     assert(tree->root->children[0]->children[0]->children[0]->keys[0] == 3);
     assert(tree->root->children[0]->children[0]->children[1]->keys[0] == 6);
     printf("Cascade test 2 passed.\n");
+    freeTree(tree);
 }  
 
 void test_bplus_tree_delete_cascade_extreme(){
@@ -226,6 +254,7 @@ void test_bplus_tree_delete_cascade_extreme(){
         assert(search(tree, i));
     }
     printf("Extreme cascade test passed.\n");
+    freeTree(tree);
 }   
 
 void test_bplus_tree_get_closest_node(){
@@ -250,6 +279,7 @@ void test_bplus_tree_get_closest_node(){
     assert(cln->leaf);
     assert(cly->leaf);
     printf("Get closest node test passed.\n");
+    freeTree(tree);
 }
 
 void test_bplus_tree_get_closest_node_mass_delete_0(){
@@ -267,6 +297,7 @@ void test_bplus_tree_get_closest_node_mass_delete_0(){
     assert(cl->keys[0]==300 || cl->keys[2]==300 || cl->keys[3]==300);
     assert(cly->leaf);
     printf("Get closest node mass delete test 0 passed.\n");
+    freeTree(tree);
 }
 void test_bplus_tree_get_closest_node_mass_delete_1(){
     BPT* tree = bptInit(3);
@@ -283,6 +314,7 @@ void test_bplus_tree_get_closest_node_mass_delete_1(){
     assert(cl->keys[0]==750 || cl->keys[2]==750 || cl->keys[3]==750);
     assert(cly->leaf);
     printf("Get closest node mass delete test 1 passed.\n");
+    freeTree(tree);
 }
 
 void test_bplus_tree_get_closest_node_max_int(){
@@ -295,6 +327,7 @@ void test_bplus_tree_get_closest_node_max_int(){
     assert(cl->keys[0]==999 || cl->keys[2]==999 || cl->keys[3]==999);
     assert(cl->leaf);
     printf("Get closest node max int test passed.\n");
+    freeTree(tree);
 }
 
 void test_bplus_tree_range_0(){
@@ -302,12 +335,13 @@ void test_bplus_tree_range_0(){
     for (int i = 0; i<10; i++){
         insert(tree, i);
     }
-    int* range = getRange(tree, 0, 9);
+    int* range = getRange(tree, 0, 100);
     for (int i = 0; i<9; i++){
         assert(range[i] == i);
     }
     assert(!(range[11]==21));
     printf("Range test passed.\n");
+    freeTree(tree);
 }
 
 void test_bplus_tree_range_1(){
@@ -317,36 +351,93 @@ void test_bplus_tree_range_1(){
     }
     int* range = getRange(tree, 0, 999);
     for (int i = 0; i<20; i++){
-        printf("%d ", range[i]);
         assert(range[i] == i);
     }
-    assert(!(range[20]==-1));
+    assert((range[20]==-1));
     printf("Range test 1 passed.\n");
+    freeTree(tree);
+}
+
+void test_bplus_tree_range_random_order(){
+    BPT* tree = bptInit(3);
+    for (int i = 0; i<1000; i++){
+        int r = rand();
+        if (!search(tree, r)){
+            insert(tree, r);
+        }
+    }
+    int* range = getRange(tree, 500, 5000);
+    int* range1 = getRange(tree, 500, 500);
+    assert(range1[0] == 500 || range1[0] == -1);
+    for (int i = 0; range[i]!= -1; i++){
+        assert(search(tree, range[i]));
+    }
+    printf("Range random order test passed.\n");
+    freeTree(tree);
+}
+
+void test_bplus_tree_range_with_deletes_0(){
+    BPT* tree = bptInit(3);
+    for (int i = 0; i<20; i++){
+        insert(tree, i);
+    }
+    del(tree, 12);
+    del(tree, 13);
+    del(tree, 14);
+    del(tree, 15);
+    del(tree, 16);
+    del(tree, 17);
+    int* range = getRange(tree, -1, INT_MAX);
+    for (int i = 0; range[i]!= -1; i++){
+        assert(search(tree, range[i]));
+    }
+    printf("Range with deletes test 0 passed.\n");
+    freeTree(tree);
+}
+
+void test_bplus_tree_range_with_deletes_1(){
+    BPT* tree = bptInit(3);
+    for (int i = 0; i<1000; i++){
+        insert(tree, i);
+    }
+    for (int i = 250; i<500; i++){
+        del(tree, i);
+    }
+    int* range = getRange(tree, 0, 10000);
+    for (int i = 0; range[i]!= -1; i++){
+        assert(search(tree, range[i]));
+    }
+    printf("Range with deletes test 1 passed.\n");
+    freeTree(tree);
 }
 
 int main() {
     printf("\n");
-    // test_bplus_tree_initialization();
-    // test_bplus_tree_insertion_0();
-    // test_bplus_tree_insertion_1();
-    // test_bplus_tree_insertion_2();
-    // test_bplus_tree_node_split();
-    // test_bplus_tree_propagate_splits_upward();
-    // test_bplus_tree_double_split();
-    // test_bplus_tree_extreme_split();
-    // test_bplus_tree_random_numbers();
-    // test_bplus_tree_search();
-    // test_bplus_tree_search_extreme();
-    // test_bplus_tree_deletion();
-    // test_bplus_tree_delete_cascade();
-    // test_bplus_tree_delete_cascade_1();
-    // test_bplus_tree_delete_cascade_2();
-    // test_bplus_tree_delete_cascade_extreme();
-    // test_bplus_tree_get_closest_node();
-    // test_bplus_tree_get_closest_node_mass_delete_0();
-    // test_bplus_tree_get_closest_node_mass_delete_1();
-    // test_bplus_tree_get_closest_node_max_int();
-    // test_bplus_tree_range_0();
+    // test_free_tree();
+    test_bplus_tree_initialization();
+    test_bplus_tree_insertion_0();
+    test_bplus_tree_insertion_1();
+    test_bplus_tree_insertion_2();
+    test_bplus_tree_node_split();
+    test_bplus_tree_propagate_splits_upward();
+    test_bplus_tree_double_split();
+    test_bplus_tree_extreme_split();
+    test_bplus_tree_random_numbers();
+    test_bplus_tree_search();
+    test_bplus_tree_search_extreme();
+    test_bplus_tree_deletion();
+    test_bplus_tree_delete_cascade();
+    test_bplus_tree_delete_cascade_1();
+    test_bplus_tree_delete_cascade_2();
+    test_bplus_tree_delete_cascade_extreme();
+    test_bplus_tree_get_closest_node();
+    test_bplus_tree_get_closest_node_mass_delete_0();
+    test_bplus_tree_get_closest_node_mass_delete_1();
+    test_bplus_tree_get_closest_node_max_int();
+    test_bplus_tree_range_0();
     test_bplus_tree_range_1();
+    test_bplus_tree_range_random_order();
+    test_bplus_tree_range_with_deletes_0();
+    test_bplus_tree_range_with_deletes_1();
     return 0;
 }
