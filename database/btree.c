@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stddef.h>
 #include "btree.h"
-#include <climits>
+// #include <climits>
 
 BPT* bptInit(int _t){
     BPT* tree = (BPT*)malloc(sizeof(BPT));
@@ -227,10 +227,12 @@ int nodeDel(BPTNode* root, int key){
 
 void clearEmptyNode(BPTNode* root){
     if (root->keys[0] != INT_MAX) return;
-    else {
+    else if (root->parent != NULL){
         BPTNode* parent = root->parent;
         int i = 0;
-        while (i<=parent->n && parent->children[i]->keys[0] != INT_MAX) i++;
+        while (i<parent->n && parent->children[i] != root) i++;
+            parent->n;
+            parent->children[i+1];
         if (root->leaf){
             if (root->prev != NULL){
                 root->prev->next = root->next;
@@ -272,6 +274,7 @@ int* getRange(BPT* tree, int start, int end){
         while (closestStart->keys[i] < start) i++;
         while(i<closestStart->n && closestStart->keys[i] <= end){
             nodes[len] = closestStart->keys[i];
+            printf("Added %d\n", nodes[len]);
             len++;
             i++;
             

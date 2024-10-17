@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <stdlib.h>
-#include <climits>
+// #include <climits>
 #include <cstring>
 
 void get_memory_usage_kb(long* vmrss_kb, long* vmsize_kb) {
@@ -45,8 +45,38 @@ void test_free_tree() {
     // Print memory usage details
     // printf("Memory usage before: VmRSS = %ld KB, VmSize = %ld KB\n", vmrss_before, vmsize_before);
     // printf("Memory usage after: VmRSS = %ld KB, VmSize = %ld KB\n", vmrss_after, vmsize_after);
-    printf("Memory used: VmRSS = %ld KB, VmSize = %ld KB\n", vmrss_after - vmrss_before, vmsize_after - vmsize_before);
+    printf("Memory used: VmRSS = %ld KB, VmSize = %ld KB\n", (vmrss_after - vmrss_before), (vmsize_after - vmsize_before));
     printf("Free tree test passed.\n");
+}
+
+void printBTree(BPTNode* root, int level) {
+    if (root != NULL) {
+        // Print current node's keys
+        for (int i = 0; i < level; i++) printf("  "); // Indentation for levels
+        for (int i = 0; i < root->n; i++) {
+            printf("%d ", root->keys[i]);
+        }
+        printf("\n");
+        // Recursively print children nodes
+        if (!root->leaf) {
+            for (int i = 0; i <= root->n; i++) {
+                printBTree(root->children[i], level + 1);
+            }
+        }
+    }
+}
+
+void printBTreeLeaves(BPTNode* root) {
+    if (root->leaf){
+        for (int i = 0; i < root->n; i++){
+            printf("%d ", root->keys[i]);
+        }
+        printf("\n");
+    } else {
+        for (int i = 0; i <= root->n; i++){
+            printBTreeLeaves(root->children[i]);
+        }
+    }
 }
 
 void test_bplus_tree_initialization() {
@@ -402,7 +432,7 @@ void test_bplus_tree_range_with_deletes_1(){
     for (int i = 0; i<1000; i++){
         insert(tree, i);
     }
-    for (int i = 250; i<256; i++){
+    for (int i = 250; i<500; i++){
         del(tree, i);
     }
     int* range = getRange(tree, 0, 10000);
@@ -461,36 +491,63 @@ void test_bplus_tree_extreme_full_1000000(){
     printf("Extreme full test 1,000,000 passed.\n");
 }
 
-void test_bplus_tree_extreme_full_1000000000(){
+void test_bplus_tree_extreme_full_10000000(){
     BPT* tree = bptInit(3);
     printf("Inserting\n");
-    for (int i = 0; i<1000000000; i++){
+    for (int i = 0; i<10000000; i++){
+        insert(tree, rand());
+    }
+    for (int i = 0; i<500000; i++){
+        del(tree, rand());
+    }
+    
+    int* range = getRange(tree, -INT_MAX, INT_MAX);
+    if (range == NULL) printf("Range is null\n");
+    printf("%d\n", range[0]);
+    for (int i = 0; range[i]!= -1; i++){
+        printf("%d, %d\n", i, range[i]);
+        assert(search(tree, range[i]));
+    }
+    for (int i = 0; i<10000000; i++){
+        insert(tree, rand());
+    }
+    int* range1 = getRange(tree, 7000000, INT_MAX);
+    for (int i = 0; range1[i]!= -1; i++){
+        assert(search(tree, range1[i]));
+    }
+    printf("Extreme full test 10,000,000 passed.\n");
+}
+void test_bplus_tree_extreme_full_100000000(){
+    BPT* tree = bptInit(3);
+    printf("Inserting\n");
+    for (int i = 0; i<100000000; i++){
         insert(tree, i);
     }
-    for (int i = 128918173; i<624156273; i++){
+    for (int i = 12891873; i<62456273; i++){
         del(tree, i);
     }
+    printf("Getting range\n");
     int* range = getRange(tree, -INT_MAX, INT_MAX);
     printf("Searching\n");
     for (int i = 0; range[i]!= -1; i++){
         assert(search(tree, range[i]));
     }
     printf("Inserting\n");
-    for (int i = 0; i<1000000000; i++){
+    for (int i = 0; i<100000000; i++){
         insert(tree, rand());
     }
     printf("Getting range\n");
-    int* range1 = getRange(tree, 700000000, INT_MAX);
+    int* range1 = getRange(tree, 70000000, INT_MAX);
     for (int i = 0; range1[i]!= -1; i++){
         assert(search(tree, range1[i]));
     }
-    printf("Extreme full test 1,000,000,000 passed.\n");
+    printf("Extreme full test 100,000,000 passed.\n");
 }
 
 
 int main() {
     printf("\n");
-    test_free_tree();
+    // test_free_tree();
     // test_bplus_tree_initialization();
     // test_bplus_tree_insertion_0();
     // test_bplus_tree_insertion_1();
@@ -518,6 +575,6 @@ int main() {
     // test_bplus_tree_range_with_deletes_1();
     // test_bplus_tree_extreme_full_10000();
     // test_bplus_tree_extreme_full_1000000();
-    // test_bplus_tree_extreme_full_1000000000();
+    test_bplus_tree_extreme_full_10000000();
     return 0;
 }
