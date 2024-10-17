@@ -155,8 +155,16 @@ void nodeSplit(BPTNode* root){
         rightNode->parent = parent;
         //update linked list
         if (leftNode->leaf){
-            leftNode->prev = parent->prev;
-            rightNode->next = parent->next;
+            if (root->prev != NULL){
+                printf("Updating left node prev which has first key: %d\n", root->prev->keys[0]);
+                root->prev->next = leftNode;
+                leftNode->prev = root->prev;
+            }
+            if (root->next != NULL){
+                printf("Updating right node next which has first key: %d\n", root->next->keys[0]);
+                root->next->prev = rightNode;
+                rightNode->next = root->next;
+            }
         }
         if (parent->n == 2 * parent->t) {
             nodeSplit(parent);
@@ -243,10 +251,32 @@ BPTNode* getClosestNode(BPTNode* node, int key){
     return getClosestNode(node->children[i], key);
 }
 
-BPTNode* getRange(BPT* tree, int start, int end){
+int* getRange(BPT* tree, int start, int end){
     if (tree->root == NULL) return NULL;
     if (tree->root->keys[0] == INT_MAX) return NULL;
-    BPTNode* closest = getClosestNode(tree->root, start);
-    
-
+    BPTNode* closestStart = getClosestNode(tree->root, start);
+    BPTNode* closestEnd = getClosestNode(tree->root, end);
+    int len = 0, size = 4;
+    int* nodes = (int*)malloc(sizeof(int)*4);
+    while (closestStart != NULL && closestStart->prev != closestEnd){
+        int i = 0; 
+        while (closestStart->keys[i] < start) i++;
+        while(i<closestStart->n && closestStart->keys[i] <= end){
+            nodes[len] = closestStart->keys[i];
+            len++;
+            i++;
+            
+            if (len==size){
+                printf("reallocating to size %d\n", size*2);
+                int* temp = (int*)malloc(sizeof(int)*size*2);
+                for (int i = 0; i< size; i++){
+                    temp[i] = nodes[i];
+                }
+                size *= 2;
+            }
+        }
+        closestStart = closestStart->next;
+    }
+    if (len!=size) nodes[len] = -1;
+    return nodes;
 }

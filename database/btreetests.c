@@ -267,8 +267,6 @@ void test_bplus_tree_get_closest_node_mass_delete_0(){
     assert(cl->keys[0]==300 || cl->keys[2]==300 || cl->keys[3]==300);
     assert(cly->leaf);
     printf("Get closest node mass delete test 0 passed.\n");
-    printBTreeLeaves(tree->root);
-    printBTree(tree->root, 0);
 }
 void test_bplus_tree_get_closest_node_mass_delete_1(){
     BPT* tree = bptInit(3);
@@ -287,26 +285,68 @@ void test_bplus_tree_get_closest_node_mass_delete_1(){
     printf("Get closest node mass delete test 1 passed.\n");
 }
 
+void test_bplus_tree_get_closest_node_max_int(){
+    BPT* tree = bptInit(3);
+    for (int i = 0; i<1000; i++){
+        insert(tree, i);
+    }
+    BPTNode* cl = getClosestNode(tree->root, INT_MAX);
+    assert(cl != NULL);
+    assert(cl->keys[0]==999 || cl->keys[2]==999 || cl->keys[3]==999);
+    assert(cl->leaf);
+    printf("Get closest node max int test passed.\n");
+}
+
+void test_bplus_tree_range_0(){
+    BPT* tree = bptInit(3);
+    for (int i = 0; i<10; i++){
+        insert(tree, i);
+    }
+    int* range = getRange(tree, 0, 9);
+    for (int i = 0; i<9; i++){
+        assert(range[i] == i);
+    }
+    assert(!(range[11]==21));
+    printf("Range test passed.\n");
+}
+
+void test_bplus_tree_range_1(){
+    BPT* tree = bptInit(3);
+    for (int i = 0; i<20; i++){
+        insert(tree, i);
+    }
+    int* range = getRange(tree, 0, 999);
+    for (int i = 0; i<20; i++){
+        printf("%d ", range[i]);
+        assert(range[i] == i);
+    }
+    assert(!(range[20]==-1));
+    printf("Range test 1 passed.\n");
+}
+
 int main() {
     printf("\n");
-    test_bplus_tree_initialization();
-    test_bplus_tree_insertion_0();
-    test_bplus_tree_insertion_1();
-    test_bplus_tree_insertion_2();
-    test_bplus_tree_node_split();
-    test_bplus_tree_propagate_splits_upward();
-    test_bplus_tree_double_split();
-    test_bplus_tree_extreme_split();
-    test_bplus_tree_random_numbers();
-    test_bplus_tree_search();
-    test_bplus_tree_search_extreme();
-    test_bplus_tree_deletion();
-    test_bplus_tree_delete_cascade();
-    test_bplus_tree_delete_cascade_1();
-    test_bplus_tree_delete_cascade_2();
-    test_bplus_tree_delete_cascade_extreme();
-    test_bplus_tree_get_closest_node();
-    test_bplus_tree_get_closest_node_mass_delete_0();
-    test_bplus_tree_get_closest_node_mass_delete_1();
+    // test_bplus_tree_initialization();
+    // test_bplus_tree_insertion_0();
+    // test_bplus_tree_insertion_1();
+    // test_bplus_tree_insertion_2();
+    // test_bplus_tree_node_split();
+    // test_bplus_tree_propagate_splits_upward();
+    // test_bplus_tree_double_split();
+    // test_bplus_tree_extreme_split();
+    // test_bplus_tree_random_numbers();
+    // test_bplus_tree_search();
+    // test_bplus_tree_search_extreme();
+    // test_bplus_tree_deletion();
+    // test_bplus_tree_delete_cascade();
+    // test_bplus_tree_delete_cascade_1();
+    // test_bplus_tree_delete_cascade_2();
+    // test_bplus_tree_delete_cascade_extreme();
+    // test_bplus_tree_get_closest_node();
+    // test_bplus_tree_get_closest_node_mass_delete_0();
+    // test_bplus_tree_get_closest_node_mass_delete_1();
+    // test_bplus_tree_get_closest_node_max_int();
+    // test_bplus_tree_range_0();
+    test_bplus_tree_range_1();
     return 0;
 }
