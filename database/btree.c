@@ -183,7 +183,6 @@ int search(BPT* tree, int key){
 }
 
 int nodeSearch(BPTNode* root, int key){
-    root->t != 3? printf("Node t: %d\n", root->t):NULL;
     if (root->keys[0] == INT_MAX){
         return 0;
     }
@@ -278,7 +277,6 @@ int* getRange(BPT* tree, int start, int end){
         while (closestStart->keys[i] < start) i++;
         while(i<closestStart->n && closestStart->keys[i] <= end){
             // printf("node key: %d\n", closestStart->keys[i]);
-            printf("node key: %d\n", closestStart->keys[i]);
             closestStart->keys[0];
             closestStart->keys[1];
             closestStart->keys[2];

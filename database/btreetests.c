@@ -471,16 +471,13 @@ void test_bplus_tree_extreme_full_10_000(){
 
 void test_bplus_tree_extreme_full_1_000_000(){
     BPT* tree = bptInit(3);
-    printf("Inserting\n");
     for (int i = 0; i<1000000; i++){
-        int r = rand();
-        insert(tree, r);
+        insert(tree, i);
     }
     // for (int i = 0; i<50000; i++){
     //     del(tree, rand());
     // }
     int* range = getRange(tree, -INT_MAX, INT_MAX);
-    printf("Done");
 
     for (int i = 0; range[i]!= -1; i++){
         assert(search(tree, range[i]));
@@ -505,9 +502,11 @@ void test_bplus_tree_extreme_full_10_000_000(){
     for (i; i<15000; i++){
         del(tree, i);
     }
-    printf(search(tree, 9999999) ? "true" : "false");
-    printf(search(tree, 10000000) ? "true" : "false");
-
+    for (i; i<15000; i++){
+        assert(!search(tree, i));
+    }
+    assert(search(tree, 9999999));
+    assert(!search(tree, 10000000));
     int* range = getRange(tree, 0, INT_MAX);
     if (range == NULL) printf("Range is null\n");
 
@@ -518,6 +517,7 @@ void test_bplus_tree_extreme_full_10_000_000(){
         insert(tree, rand());
     }
     int* range1 = getRange(tree, 7000000, INT_MAX);
+
     for (int i = 0; range1[i]!= -1; i++){
         assert(search(tree, range1[i]));
     }
@@ -581,8 +581,8 @@ int main() {
     // test_bplus_tree_range_with_deletes_0();
     // test_bplus_tree_range_with_deletes_1();
     // test_bplus_tree_extreme_full_10_000();
-    test_bplus_tree_extreme_full_1_000_000();
-    // test_bplus_tree_extreme_full_10_000_000();
+    // test_bplus_tree_extreme_full_1_000_000();
+    test_bplus_tree_extreme_full_10_000_000();
     // test_bplus_tree_extreme_full_100_000_000();
     return 0;
 }
