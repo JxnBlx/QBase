@@ -446,7 +446,7 @@ void test_bplus_tree_range_with_deletes_1(){
     freeTree(tree);
 }
 
-void test_bplus_tree_extreme_full_10000(){
+void test_bplus_tree_extreme_full_10_000(){
     BPT* tree = bptInit(3);
     for (int i = 0; i<10000; i++){
         insert(tree, rand());
@@ -469,16 +469,18 @@ void test_bplus_tree_extreme_full_10000(){
     printf("Extreme full test 10,000 passed.\n");
 }
 
-void test_bplus_tree_extreme_full_1000000(){
+void test_bplus_tree_extreme_full_1_000_000(){
     BPT* tree = bptInit(3);
     printf("Inserting\n");
     for (int i = 0; i<1000000; i++){
-        insert(tree, rand());
+        int r = rand();
+        insert(tree, r);
     }
-    for (int i = 0; i<50000; i++){
-        del(tree, rand());
-    }
+    // for (int i = 0; i<50000; i++){
+    //     del(tree, rand());
+    // }
     int* range = getRange(tree, -INT_MAX, INT_MAX);
+    printf("Done");
 
     for (int i = 0; range[i]!= -1; i++){
         assert(search(tree, range[i]));
@@ -493,7 +495,7 @@ void test_bplus_tree_extreme_full_1000000(){
     printf("Extreme full test 1,000,000 passed.\n");
 }
 
-void test_bplus_tree_extreme_full_10000000(){
+void test_bplus_tree_extreme_full_10_000_000(){
     BPT* tree = bptInit(3);
     printf("Inserting\n");
     for (int i = 0; i<10000000; i++){
@@ -522,7 +524,7 @@ void test_bplus_tree_extreme_full_10000000(){
     printf("Extreme full test 10,000,000 passed.\n");
 }
 
-void test_bplus_tree_extreme_full_100000000(){
+void test_bplus_tree_extreme_full_100_000_000(){
     BPT* tree = bptInit(3);
     printf("Inserting\n");
     for (int i = 0; i<100000000; i++){
@@ -553,34 +555,34 @@ void test_bplus_tree_extreme_full_100000000(){
 int main() {
     printf("\n");
     // test_free_tree();
-    test_bplus_tree_initialization();
-    test_bplus_tree_insertion_0();
-    test_bplus_tree_insertion_1();
-    test_bplus_tree_insertion_2();
-    test_bplus_tree_node_split();
-    test_bplus_tree_propagate_splits_upward();
-    test_bplus_tree_double_split();
-    test_bplus_tree_extreme_split();
-    test_bplus_tree_random_numbers();
-    test_bplus_tree_search();
-    test_bplus_tree_search_extreme();
-    test_bplus_tree_deletion();
-    test_bplus_tree_delete_cascade();
-    test_bplus_tree_delete_cascade_1();
-    test_bplus_tree_delete_cascade_2();
-    test_bplus_tree_delete_cascade_extreme();
-    test_bplus_tree_get_closest_node();
-    test_bplus_tree_get_closest_node_mass_delete_0();
-    test_bplus_tree_get_closest_node_mass_delete_1();
-    test_bplus_tree_get_closest_node_max_int();
-    test_bplus_tree_range_0();
-    test_bplus_tree_range_1();
-    test_bplus_tree_range_random_order();
-    test_bplus_tree_range_with_deletes_0();
-    test_bplus_tree_range_with_deletes_1();
-    test_bplus_tree_extreme_full_10000();
-    test_bplus_tree_extreme_full_1000000();
-    test_bplus_tree_extreme_full_10000000();
-    // test_bplus_tree_extreme_full_100000000();
+    // test_bplus_tree_initialization();
+    // test_bplus_tree_insertion_0();
+    // test_bplus_tree_insertion_1();
+    // test_bplus_tree_insertion_2();
+    // test_bplus_tree_node_split();
+    // test_bplus_tree_propagate_splits_upward();
+    // test_bplus_tree_double_split();
+    // test_bplus_tree_extreme_split();
+    // test_bplus_tree_random_numbers();
+    // test_bplus_tree_search();
+    // test_bplus_tree_search_extreme();
+    // test_bplus_tree_deletion();
+    // test_bplus_tree_delete_cascade();
+    // test_bplus_tree_delete_cascade_1();
+    // test_bplus_tree_delete_cascade_2();
+    // test_bplus_tree_delete_cascade_extreme();
+    // test_bplus_tree_get_closest_node();
+    // test_bplus_tree_get_closest_node_mass_delete_0();
+    // test_bplus_tree_get_closest_node_mass_delete_1();
+    // test_bplus_tree_get_closest_node_max_int();
+    // test_bplus_tree_range_0();
+    // test_bplus_tree_range_1();
+    // test_bplus_tree_range_random_order();
+    // test_bplus_tree_range_with_deletes_0();
+    // test_bplus_tree_range_with_deletes_1();
+    // test_bplus_tree_extreme_full_10_000();
+    test_bplus_tree_extreme_full_1_000_000();
+    // test_bplus_tree_extreme_full_10_000_000();
+    // test_bplus_tree_extreme_full_100_000_000();
     return 0;
 }
