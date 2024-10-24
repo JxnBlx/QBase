@@ -5,6 +5,7 @@
         "type_traits": "cpp",
         "xstring": "cpp",
         "xutility": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "stddef.h": "c"
     }
 }
