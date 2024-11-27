@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <stdlib.h>
-// #include <climits>
-#include <cstring>
+#include <limits.h>
+// #include <cstring>
 
 void get_memory_usage_kb(long* vmrss_kb, long* vmsize_kb) {
     FILE* file = fopen("/proc/self/status", "r");

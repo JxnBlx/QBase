@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stddef.h>
+#include <limits.h>
 #include "bp_tree.h"
 // #include <climits>
 

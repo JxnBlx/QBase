@@ -1,18 +1,28 @@
-typedef struct BPTNode {
-    int *keys;          // Array of keys
-    int t;              // Minimum degree (defines the range for number of keys)
-    struct BPTNode **children; // Array of child pointers
-    int n;              // Current number of keys
-    int leaf;           // Is true when node is leaf. Otherwise false
-    struct BPTNode *next; // Next node in the linked list
-    struct BPTNode *prev; // Prev node in the linked list
-    struct BPTNode *parent; // Parent node
+#include <stdint.h>
+#define _T 3
+#define MAX_KEYS _T*2
+
+typedef struct {
+    size_t filesize; // size_t bytes
+    size_t root_offset; // size_t bytes
+    uint32_t node_size; // 4 bytes
+} Header;
+
+typedef struct {
+    int *keys[MAX_KEYS];    // 24 bytes
+    size_t *children[MAX_KEYS]; // size*6 bytes
+    int n;              // 4 bytes
+    size_t next; // size_t bytes
+    size_t prev; // size_t bytes
+    size_t parent; // size_t bytes
+    bool leaf;           // 1 byte //bit?
 } BPTNode;
 
 typedef struct {
-    BPTNode* root;
-    int t;
+    size_t root_offset;
+    int t = _T;
 } BPT;
+
 
 BPT* bptInit(int _t);
 void bptnInit(BPTNode* node, int _t);
